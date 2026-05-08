@@ -8,15 +8,13 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
-// Initial Vehicle State
-let vehicle = { speed: 0, battery: 85, temp: 28, mode: 'SPORT', odo: 4821 };
+let vehicle = { speed: 0, battery: 78, temp: 28, mode: 'SPORT', odo: 4821 };
 
-// Simulation loop: Emits data every 100ms
 setInterval(() => {
-    // Random speed between 40-65 km/h
-    vehicle.speed = Math.floor(Math.random() * 25) + 40; 
+    // Simulates a realistic speed fluctuation
+    vehicle.speed = Math.floor(Math.random() * 5) + 65; 
     vehicle.battery = Math.max(0, vehicle.battery - 0.001);
     io.emit('VEHICLE_DATA', vehicle);
 }, 100);
 
-server.listen(4000, () => console.log('Backend streaming on Port 4000'));
+server.listen(4000, () => console.log('Data Engine running on Port 4000'));
