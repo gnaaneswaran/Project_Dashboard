@@ -8,13 +8,27 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
-let vehicle = { speed: 0, battery: 78, temp: 28, mode: 'SPORT', odo: 4821 };
+// Helper to generate realistic CAN data bytes
+const getHex = () => Math.floor(Math.random() * 256).toString(16).toUpperCase().padStart(2, '0');
 
 setInterval(() => {
-    // Simulates a realistic speed fluctuation
-    vehicle.speed = Math.floor(Math.random() * 5) + 65; 
-    vehicle.battery = Math.max(0, vehicle.battery - 0.001);
-    io.emit('VEHICLE_DATA', vehicle);
-}, 100);
+    const timestamp = Date.now();
+    const rawSpeed = Math.floor(Math.random() * 10) + 65; // Simulated speed
+    
+    // Realistic CAN Frame structure
+    const frame = {
+        timestamp,
+        canId: Math.random() > 0.5 ? '0x100' : '0x200',
+        dlc: 8,
+        data: `${getHex()} ${getHex()} ${getHex()} ${getHex()} 00 00 00 00`,
+        decoded: {
+            speed: rawSpeed,
+            battery: 78,
+            temp: 32,
+            mode: 'SPORT'
+        }
+    };
+    io.emit('CAN_BUS_DATA', frame);
+}, 500);
 
-server.listen(4000, () => console.log('Data Engine running on Port 4000'));
+server.listen(4000, () => console.log('CAN Simulator Active on Port 4000'));
